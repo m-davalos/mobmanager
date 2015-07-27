@@ -21,13 +21,33 @@ module Platform
         # end
         system "xcodebuild -workspace #{caps[:workspace_path]} -scheme \"#{caps[:app].gsub('.app', '')}\" -configuration Debug -sdk \"#{caps[:sim_sdk]}\" -derivedDataPath \"~/\""
         if ENV['TARGET'] == 'sauce'
-          puts 'Connecting to sauce server...'
+          puts 'MobTest: Connecting to sauce server...'
           system "curl https://#{$sauce_user}:#{$sauce_key}@saucelabs.com/rest/v1/users/#{$sauce_user}"
-          puts 'Zipping iOS app'
+          puts 'MobTest: Zipping iOS app'
           system "zip -r #{$zipped_path} #{$app_path}/"
-          puts 'Sending zipped app to sauce storage'
+          puts 'MobTest: Sending zipped app to sauce storage'
           system 'curl -u '+"#{$sauce_user}:#{$sauce_key}"+' -X POST "https://saucelabs.com/rest/v1/storage/'+$sauce_user+'+/'+$app+'.zip?overwrite=true" -H "Content-Type: application/octet-stream" --data-binary @'+$zipped_path
         end
+      end
+
+      def build_ios_app(settings)
+        puts 'MobTest: Building ios app with xcodebuild tool...'
+        system "xcodebuild -workspace #{settings[:workspace_path]} -scheme \"#{settings[:app].gsub('.app', '')}\" -configuration Debug -sdk \"#{settings[:sim_sdk]}\" -derivedDataPath \"~/\""
+      end
+
+      def setup_for_sauce(settings)
+        sauce_user = settings[:sauce_user]
+        sauce_key = settings[:sauce_key]
+        zipped_path = settings[:zipped_path]
+        app_path = settings[:app_path]
+        app = settings[:app]
+
+        puts 'Connecting to sauce server...'
+        system "curl https://#{sauce_user}:#{sauce_key}@saucelabs.com/rest/v1/users/#{sauce_user}"
+        puts 'Zipping iOS app'
+        system "zip -r #{zipped_path} #{app_path}/"
+        puts 'Sending zipped app to sauce storage'
+        system 'curl -u '+"#{sauce_user}:#{sauce_key}"+' -X POST "https://saucelabs.com/rest/v1/storage/'+sauce_user+'+/'+app+'.zip?overwrite=true" -H "Content-Type: application/octet-stream" --data-binary @'+zipped_path
       end
 
       def terminate_simulator
