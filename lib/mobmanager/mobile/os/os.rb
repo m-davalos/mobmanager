@@ -1,7 +1,11 @@
 module OS
   def mac?
-    os = %x[sw_vers -productName]
-    if os.nil? || os.empty?
+    begin
+      os = %x[sw_vers -productName]
+    rescue Exception
+      os = nil
+    end
+    if os.nil?
       return false if %x[ver].to_s.downcase.include? 'windows'
     elsif os
       return true if %[sw_vers -productName].to_s.downcase.include? 'mac'
