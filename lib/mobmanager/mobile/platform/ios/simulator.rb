@@ -7,12 +7,9 @@ module Platform
 
       include OS
 
-      def start_simulator
-        caps = YAML.load_file(Dir.pwd + '/features/support/settings/ios.yml')
-        # app_path = caps[:app_path]
-        # app = app_path.split('/').select{|element| element.include?'.app'}.first
-        # workspace_path = caps[:workspace_path]
-        # sim_sdk = caps[:sim_sdk]
+      def start_simulator(settings = nil)
+        caps = settings unless settings.nil?
+        caps = YAML.load_file(Dir.pwd + '/features/support/settings/ios.yml') if settings.nil?
 
         unless caps[:workspace_path].nil?
           build_ios_app(caps)
@@ -26,6 +23,9 @@ module Platform
       def build_ios_app(settings)
         puts 'Building ios app with xcodebuild tool...'
         puts 'MobTest: Building ios app with xcodebuild tool...'
+        #TODO - Add to PATH?
+        puts "ENV['IOS_DERIVED_DATA_PATH'] #{ENV['IOS_DERIVED_DATA_PATH']}"
+        fail("MobTest: Failed to determine app_path. Please check your ios.yml settings") if settings[:app_path].nil?
         app = settings[:app_path].split('/').select{|element| element.include?'.app'}.first
         system "xcodebuild -workspace #{settings[:workspace_path]} -scheme \"#{app.gsub('.app', '')}\" -configuration Debug -sdk \"#{settings[:sim_sdk]}\" -derivedDataPath \"~/\""
       end
@@ -39,7 +39,6 @@ module Platform
         puts 'MobTest: Connecting to sauce server...'
         system "curl https://#{sauce_user}:#{sauce_key}@saucelabs.com/rest/v1/users/#{sauce_user}"
         puts 'MobTest: Zipping iOS app'
-        #TODO - TEST
         system "zip -r #{zipped_app_path} #{app_path}/"
         zipped_app_path = zipped_app_path.gsub('~',Dir.home)
         puts 'MobTest: Sending zipped app to sauce storage'
