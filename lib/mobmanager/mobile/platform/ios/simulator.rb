@@ -31,8 +31,8 @@ module Platform
       end
 
       def setup_for_sauce(settings)
-        sauce_user = %x[echo $SAUCE_USERNAME].strip
-        sauce_key = %x[echo $SAUCE_ACCESS_KEY].strip
+        sauce_user = %x[echo $SAUCE_USER].strip
+        sauce_key = %x[echo $SAUCE_KEY].strip
         app_path = settings[:app_path]
         zipped_app_path = app_path.gsub('.app','.zip')
         app = app_path.split('/').select{|item| item.include?('.app')}.first.gsub('.app','')
