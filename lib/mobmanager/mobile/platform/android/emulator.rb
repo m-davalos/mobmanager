@@ -10,8 +10,26 @@ module Platform
       ANDROID_EMULATOR ||= ENV['DEVICE']
       OFFLINE_CHECKS ||= 15
 
-      def start_emulator
-        spawn "emulator -avd #{ANDROID_EMULATOR} -no-audio"
+      def start_emulator(settings = nil)
+        if ENV['TARGET'] == 'sauce'
+          caps = settings unless settings.nil?
+          caps = YAML.load_file(Dir.pwd + '/features/support/settings/android.yml') if settings.nil?
+          setup_for_android_sauce caps
+        else
+          spawn "emulator -avd #{ANDROID_EMULATOR} -no-audio"
+        end
+      end
+
+      def setup_for_android_sauce(settings)
+        sauce_user = %x[echo $SAUCE_USER].strip
+        sauce_key = %x[echo $SAUCE_KEY].strip
+        app_path = settings[:apk_path]
+        app = app_path.split('/').select{|item| item.include?('.apk')}.first
+        puts 'MobTest: Connecting to sauce server...'
+        system "curl https://#{sauce_user}:#{sauce_key}@saucelabs.com/rest/v1/users/#{sauce_user}"
+        puts 'MobTest: Sending apk to sauce storage'
+        system 'curl -u '+"#{sauce_user}:#{sauce_key}"+' -X POST "https://saucelabs.com/rest/v1/storage/'+sauce_user+'/'+app+'?overwrite=true" -H "Content-Type: application/octet-stream" --data-binary @'+app_path
+
       end
 
       # Wait until emulator is online
