@@ -25,7 +25,7 @@ module Mobile
           if ENV['IOS_PHONE'] == 'simulator'
             start_server
           else
-            start_server ENV['DEVICE']
+            start_server ENV['UIUD']
           end
         end
 
