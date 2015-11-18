@@ -27,7 +27,7 @@ module Platform
         puts "ENV['IOS_DERIVED_DATA_PATH'] #{ENV['IOS_DERIVED_DATA_PATH']}"
         fail("MobTest: Failed to determine app_path. Please check your ios.yml settings") if settings[:app_path].nil?
         app = settings[:app_path].split('/').select{|element| element.include?'.app'}.first
-        system "xcodebuild -workspace #{settings[:workspace_path]} -scheme \"#{app.gsub('.app', '')}\" -configuration Debug -sdk \"#{settings[:sim_sdk]}\" -derivedDataPath \"~/\""
+        system "xcodebuild -workspace #{settings[:workspace_path]} -scheme \"#{app.gsub('.app', '')}\" -configuration Debug -sdk \"#{settings['sim_sdk']}\" -derivedDataPath \"~/\""
       end
 
       def setup_for_sauce(settings)
