@@ -64,7 +64,7 @@ module Mobile
 
       def start_server(id=nil, log_level='--log-level error')
         udid = "--udid #{id}" unless id.nil?
-        command = "appium #{udid} #{log_level}"
+        command = "appium #{udid} #{log_level} --session-override"
         spawn command
       end
     end

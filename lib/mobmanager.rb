@@ -7,7 +7,3 @@ require 'mobmanager/mobile/platform/android/emulator'
 require 'mobmanager/mobile/platform/ios/common'
 require 'mobmanager/mobile/platform/ios/device'
 require 'mobmanager/mobile/platform/ios/simulator'
-
-# module Mobmanager
-#
-# end
