@@ -5,7 +5,7 @@ module Mobile
     module Server
       include OS
 
-      def start_appium_server
+      def start_appium_server(id=nil, opt='')
         end_appium_server if node_running?
         puts 'Starting Appium server...'
 
@@ -14,18 +14,18 @@ module Mobile
         if platform == 'android'
           puts '-- Android Platform --'
           if ENV['ANDROID_PHONE'] == 'emulator'
-            start_server
+            start_server(id, opt)
           else
-            start_server ENV['DEVICE']
+            start_server(ENV['DEVICE'], opt)
           end
         end
 
         if platform == 'ios'
           puts '-- IOS Platform --'
           if ENV['IOS_PHONE'] == 'simulator'
-            start_server
+            start_server(id, opt)
           else
-            start_server ENV['UIUD']
+            start_server(ENV['UIUD'], opt)
           end
         end
 
@@ -62,9 +62,10 @@ module Mobile
         warn '[PANIC]: Something went wrong while terminating the appium server.'
       end
 
-      def start_server(id=nil, log_level='--log-level error')
+      def start_server(id=nil, opt='')
         udid = "--udid #{id}" unless id.nil?
-        command = "appium #{udid} #{log_level} --session-override"
+        command = "appium #{udid} #{opt}"
+        command = "appium #{udid} --log-level error --session-override" if opt.empty?
         spawn command
       end
     end
